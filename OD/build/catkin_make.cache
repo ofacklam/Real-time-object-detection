@@ -1,0 +1,2 @@
+zed-ros-wrapper/examples/zed_nodelet_example:zed-ros-wrapper/examples/zed_rtabmap_example:zed-ros-wrapper/tutorials/zed_depth_sub_tutorial:zed-ros-wrapper/tutorials/zed_tracking_sub_tutorial:zed-ros-wrapper/tutorials/zed_video_sub_tutorial:zed-ros-wrapper/zed_display_rviz:zed-ros-wrapper/zed_ros:zed-ros-wrapper/zed_wrapper
+-DCATKIN_DEVEL_PREFIX=/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/devel -DCMAKE_INSTALL_PREFIX=/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/install -G Unix Makefiles

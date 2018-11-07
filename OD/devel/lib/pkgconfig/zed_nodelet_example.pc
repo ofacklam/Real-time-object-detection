@@ -1,0 +1,8 @@
+prefix=/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/devel
+
+Name: zed_nodelet_example
+Description: Description of zed_nodelet_example
+Version: 2.7.0
+Cflags: 
+Libs: -L/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/devel/lib 
+Requires: 
