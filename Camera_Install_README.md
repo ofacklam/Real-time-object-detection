@@ -19,9 +19,10 @@ sudo apt-get update
 
 ## Installation du Toolkit CUDA
 
-- Télécharger sur cette page https://developer.nvidia.com/cuda-downloads l'installateur CUDA. Il faut sélectionner Linux -> x86_64 -> Ubuntu -> 16.04 -> runfile (local) puis cliquer sur Download. 
+- Télécharger sur cette page https://developer.nvidia.com/cuda-92-download-archive l'installateur CUDA. Il faut sélectionner Linux -> x86_64 -> Ubuntu -> 16.04 -> runfile (local) puis cliquer sur Download. 
 - Lancer le fichier en tapant `sudo sh [nom_du_fichier]`, par exemple `sudo sh cuda_10.0.130_410.48_linux.run`
 - Suivre les instructions de l'installateur EN REFUSANT d'installer le Driver nVidia.
+- Eventuellement installer le Patch qui est téléchargeable a la meme adresse.
 
 ## Installation du ZED SDK
 
