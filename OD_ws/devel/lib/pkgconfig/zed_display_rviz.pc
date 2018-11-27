@@ -1,8 +1,0 @@
-prefix=/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/devel
-
-Name: zed_display_rviz
-Description: Description of zed_display_rviz
-Version: 2.7.0
-Cflags: 
-Libs: -L/home/ofacklam/Documents/PSC/Real-time-object-detection/OD/devel/lib 
-Requires: 

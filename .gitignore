@@ -3,6 +3,8 @@ tests/*
 
 OD_ws/build/
 OD_ws/build/*
+OD_ws/devel/
+OD_ws/devel/*
 
 OD_ws/src/zed-ros-wrapper/
 OD_ws/src/zed-ros-wrapper/*
