@@ -1,0 +1,8 @@
+tests/
+tests/*
+
+OD_ws/build/
+OD_ws/build/*
+
+OD_ws/src/zed-ros-wrapper/
+OD_ws/src/zed-ros-wrapper/*
