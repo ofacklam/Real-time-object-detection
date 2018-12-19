@@ -81,21 +81,21 @@ chmod +x ZED_SDK_Linux_*.run
 - Essayer d'installer a partir de `apt`. 
 - Sinon : 
 	- Installer les dépendences de OpenCV : 
-```
-sudo apt-get install build-essential
-sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
-```
+	```
+	sudo apt-get install build-essential
+	sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+	```
 	- Cloner le repository OpenCV dans un endroit quelconque
-```
-git clone https://github.com/opencv/opencv.git
-git clone https://github.com/opencv/opencv_contrib.git
-```
+	```
+	git clone https://github.com/opencv/opencv.git
+	git clone https://github.com/opencv/opencv_contrib.git
+	```
 	- Créer un répertoire dans opencv
-```
-cd opencv
-mkdir build
-cd build
-```
+	```
+	cd opencv
+	mkdir build
+	cd build
+	```
 	- Executer `cmake` pour la configuration : `cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=<path/vers/opencv_contrib/modules> ..`
 	- Build avec la commande `make -j7`
 	- Installer les librairies avec `sudo make install`
