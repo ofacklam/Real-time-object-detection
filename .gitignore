@@ -8,3 +8,6 @@ OD_ws/devel/*
 
 OD_ws/src/zed-ros-wrapper/
 OD_ws/src/zed-ros-wrapper/*
+
+OD_ws/src/darknet_ros/
+OD_ws/src/darknet_ros/*
