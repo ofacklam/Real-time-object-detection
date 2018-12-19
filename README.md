@@ -5,7 +5,7 @@ Projet de détection et suivi d'objet en temps réel pour permettre l'évitement
 
 ## Configuration du projet
 
-- Installer les dépendances : OpenCV et caméra (cf. ci-dessous)
+- Installer les dépendances de la caméra (cf. ci-dessous)
 - Cloner le repository en executant `git clone https://github.com/ofacklam/Real-time-object-detection.git`
 - Aller dans le dossier source `cd Real-time-object-detection/OD_ws/src`
 - Cloner le repository de zed-ros-wrapper (le module qui integre la caméra ZED dans ROS) `git clone https://github.com/stereolabs/zed-ros-wrapper.git`
@@ -33,28 +33,6 @@ Projet de détection et suivi d'objet en temps réel pour permettre l'évitement
 	- yolov3 : `roslaunch darknet_ros yolo_v3.launch`
 - Lien stratus vers les rosbags tests : https://stratus.binets.fr/s/QCEoQPeoXkrRcJP
 	- Lancer le YOLO puis le rosbag
-
-## Installation de OpenCV
-
-- Installer les dépendences de OpenCV : 
-```
-sudo apt-get install build-essential
-sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
-```
-- Cloner le repository OpenCV dans un endroit quelconque
-```
-git clone https://github.com/opencv/opencv.git
-git clone https://github.com/opencv/opencv_contrib.git
-```
-- Créer un répertoire dans opencv
-```
-cd opencv
-mkdir build
-cd build
-```
-- Executer `cmake` pour la configuration : `cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=<path/vers/opencv_contrib/modules> ..`
-- Build avec la commande `make -j7`
-- Installer les librairies avec `sudo make install`
 
 ## Installation de la caméra ZED utilisée par le robot Maryam
 
@@ -96,3 +74,28 @@ chmod +x ZED_SDK_Linux_*.run
 ./ZED_SDK_Linux_*.run
 ```
 - Redémarrer l'ordinateur.
+
+
+## Si vous avez des problemes d'affichage / de dépendances : Installation de OpenCV
+
+- Essayer d'installer a partir de `apt`. 
+- Sinon : 
+	- Installer les dépendences de OpenCV : 
+```
+sudo apt-get install build-essential
+sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+```
+	- Cloner le repository OpenCV dans un endroit quelconque
+```
+git clone https://github.com/opencv/opencv.git
+git clone https://github.com/opencv/opencv_contrib.git
+```
+	- Créer un répertoire dans opencv
+```
+cd opencv
+mkdir build
+cd build
+```
+	- Executer `cmake` pour la configuration : `cmake -D CMAKE_BUILD_TYPE=Release -D OPENCV_EXTRA_MODULES_PATH=<path/vers/opencv_contrib/modules> ..`
+	- Build avec la commande `make -j7`
+	- Installer les librairies avec `sudo make install`
