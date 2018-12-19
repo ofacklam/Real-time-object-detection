@@ -32,7 +32,7 @@ Projet de détection et suivi d'objet en temps réel pour permettre l'évitement
 	- yolov2-tiny : `roslaunch darknet_ros darknet_ros.launch`
 	- yolov3 : `roslaunch darknet_ros yolo_v3.launch`
 - Lien stratus vers les rosbags tests : https://stratus.binets.fr/s/QCEoQPeoXkrRcJP
-	Lancer le rosbag puis YOLO
+	- Lancer le rosbag puis YOLO
 
 ## Installation de OpenCV
 
