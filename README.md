@@ -96,3 +96,6 @@ chmod +x ZED_SDK_Linux_*.run
 ```
 - Redémarrer l'ordinateur.
 
+### Vidéos tests
+
+Lien stratus vers les rosbags tests : https://stratus.binets.fr/s/QCEoQPeoXkrRcJP
