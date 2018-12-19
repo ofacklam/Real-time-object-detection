@@ -1,14 +1,15 @@
+#!/usr/bin/env python
 # Revision $Id$
 
 ## Simple talker demo that listens to std_msgs/Strings published 
 ## to the 'chatter' topic
 
 import rospy
-from darknet_ros.msg import BoudingBoxes
+from darknet_ros_msgs.msg import BoundingBoxes
 
 
 def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.data)
+    rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.bounding_boxes[0])
 
 def listener():
 
