@@ -7,10 +7,12 @@
 import rospy
 from darknet_ros_msgs.msg import BoundingBoxes
 from std_msgs.msg import Header
-from costmap_converter.msg import ObstacleArrayMsg
+from costmap_converter.msg import ObstacleArrayMsg, ObstacleMsg
+from geometry_msgs.msg import Polygon, Point32
 import message_filters
 from sensor_msgs.msg import Image
 import math
+import struct
 
 FOV = math.pi/2 # field of view en radian
 
@@ -33,9 +35,12 @@ def callback(image_yolo, prof, pub):
 		xcentre = (box.xmax + box.xmin)/2
 		ycentre = (box.ymax + box.ymin)/2
 		# verifier la nature de l indexation de data
-		depth = prof.data[ycentre*prof.step + xcentre]
+		index = 4*(ycentre * prof.width + xcentre)
+		ba = bytearray(prof.data[index : index+4])
+		depth = struct.unpack('<f', ba)[0]
+		print(depth)
 		point1.x = depth
-		ponit2.x = depth
+		point2.x = depth
 
 		widthm = 2*depth*math.tan(FOV/2)
 		point1.y = widthm*(0.5-box.xmin/prof.width)
@@ -58,21 +63,20 @@ def callback(image_yolo, prof, pub):
 	pub.publish(msg)
 			
 	
-
 def translator():
-    rospy.init_node('translator', anonymous=True)
-    pub = rospy.Publisher('bounding_boxes_analyser/yolo_messages', ObstacleArrayMsg, queue_size=10)
+	rospy.init_node('translator', anonymous=True)
+	pub = rospy.Publisher('bounding_boxes_analyser/yolo_messages', ObstacleArrayMsg, queue_size=10)
 	# Publie a la reception de chaque message
-    image_yolo = message_filters.Subscriber('/darknet_ros/bounding_boxes', BoundingBoxes)
+	image_yolo = message_filters.Subscriber('/darknet_ros/bounding_boxes', BoundingBoxes)
 	prof = message_filters.Subscriber('/zed/depth/depth_registered', Image)
 
 	ts = message_filters.ApproximateTimeSynchronizer([image_yolo, prof], 30, 0.1, allow_headerless=True)
 	ts.registerCallback(lambda x,y: callback(x,y,pub))
 
-    # spin() simply keeps python from exiting until this node is stopped
-    rospy.spin()
+	# spin() simply keeps python from exiting until this node is stopped
+	rospy.spin()
 
 
 if __name__ == '__main__':
-    translator()
+	translator()
 
