@@ -1,6 +1,9 @@
 tests/
 tests/*
 
+backup/
+backup/*
+
 OD_ws/build/
 OD_ws/build/*
 OD_ws/devel/
