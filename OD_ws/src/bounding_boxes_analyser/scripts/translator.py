@@ -11,10 +11,13 @@ import message_filters
 from sensor_msgs.msg import Image
 import math
 import struct
+import random
+import numpy
 from visualization_msgs.msg import Marker, MarkerArray
 
-#Reste à faire
-    # trouver une profondeur plus précise (faire plusieurs essais avec des tables)
+#Reste a faire
+    # trouver une profondeur plus precise (faire plusieurs essais avec des tables)
+    # rajouter de quoi evaluer temporellement les performances
     # detecter les personnes pour en faire une exception avec un seuil d'acceptation
 
 FOV = math.pi/2 # field of view en radian
@@ -29,7 +32,7 @@ def callback(image_yolo,prof,pub,pubRViz):
         # x -> -y
         # y -> -z
         # z -> x
-        # les messages sont enregistrés dans le repère de la caméra nommé: 'zed_left_camera_frame' stacké dans repere
+        # les messages sont enregistres dans le repere de la camera nomme: 'zed_left_camera_frame' stocke dans repere
         box = image_yolo.bounding_boxes[i]
 
         point1 = Point32()
@@ -38,12 +41,7 @@ def callback(image_yolo,prof,pub,pubRViz):
         point1.z = 0
         point2.z = 0
 
-        xcentre = (box.xmax + box.xmin)/2
-        ycentre = (box.ymax + box.ymin)/2
-        # verifier la nature de l indexation de data
-        index = 4*(ycentre * prof.width + xcentre)
-        ba = bytearray(prof.data[index : index+4])
-        depth = struct.unpack('<f', ba)[0]
+        depth = depth2(box,prof)
         print(depth)
         point1.x = depth
         point2.x = depth
@@ -85,8 +83,97 @@ def callback(image_yolo,prof,pub,pubRViz):
     msgRViz = MarkerArray()
     msgRViz.markers = tabRViz
     pubRViz.publish(msgRViz)
-            
+
+def depth(x,y,prof):
+    #Renvoie la profondeur du point de coordonees (x,y)
+    index = 4*(y * prof.width + x)
+    ba = bytearray(prof.data[index : index+4])
+    depth = struct.unpack('<f', ba)[0]
+    if numpy.isnan(depth) or numpy.isinf(depth):
+        return numpy.inf
+    return depth
+
+def depth1(box,prof):
+    #Renvoie la profondeur du centre
+    xcentre = (box.xmax + box.xmin)/2
+    ycentre = (box.ymax + box.ymin)/2
+    # verifier la nature de l indexation de data
+    return depth(xcentre,ycentre,prof)
+
+def depth2(box,prof):
+    #Renvoie la profondeur minimale
+    mini = depth(box.xmin,box.ymin,prof)
+    for x in range(box.xmin,box.xmax):
+        for y in range(box.ymin,box.ymax):
+            current_depth = depth(x,y,prof)
+            if current_depth < mini:
+                mini = current_depth
+    return mini
+
+def depth3(box,prof):
+    #Renvoie la profondeur minimale sur une croix +
+    xcentre = (box.xmax + box.xmin)/2
+    ycentre = (box.ymax + box.ymin)/2
+    mini = depth(xcentre,ycentre,prof)
+    for x in range(box.xmin,box.xmax):
+        current_depth = depth(x,ycentre,prof)
+        if current_depth < mini:
+            mini = current_depth
+    for y in range(box.ymin,box.ymax):
+            current_depth = depth(xcentre,y,prof)
+            if current_depth < mini:
+                mini = current_depth
+    return mini
     
+def depth4(box,prof):
+    #Renvoie la profondeur minimale sur une croix x
+    #Cancer, ne fonctionne pas bien (sortie du tableau)
+    mini = depth(box.xmin,box.ymin,prof)
+    m = (box.ymax - box.ymin)/float(box.xmax - box.xmin)
+    p = -m*box.xmax + box.ymax
+    for x in range(box.xmin,box.xmax-1):
+        current_depth = depth(x,int(m*x + p),prof)
+        if current_depth < mini:
+            mini = current_depth
+    m = -m
+    p = -m*box.xmax + box.ymin
+    for x in range(box.xmin,box.xmax-1):
+        current_depth = depth(x,int(m*x + p),prof)
+        if current_depth < mini:
+            mini = current_depth
+    return mini
+
+def depth5(box,prof):
+    #Renvoie la profondeur minimale sur 100 points aleatoires
+    mini = depth(box.xmin,box.ymin,prof)
+    for i in range(100):
+        x = random.randint(box.xmin,box.xmax-1)
+        y = random.randint(box.ymin,box.ymax-1)
+        current_depth = depth(x,y,prof)
+        if current_depth < mini:
+            mini = current_depth
+    return mini
+
+def depth6(box,prof):
+    #Renvoie la profondeur minimale sur une colonne aleatoire
+    x = random.randint(box.xmin,box.xmax-1)
+    mini = depth(x,box.ymin,prof)
+    for y in range(box.ymin,box.ymax):
+            current_depth = depth(x,y,prof)
+            if current_depth < mini:
+                mini = current_depth
+    return mini
+
+def depth7(box,prof):
+    #Renvoie la profondeur minimale sur une ligne aleatoire
+    y = random.randint(box.ymin,box.ymax-1)
+    mini = depth(box.xmin,y,prof)
+    for x in range(box.xmin,box.xmax):
+            current_depth = depth(x,y,prof)
+            if current_depth < mini:
+                mini = current_depth
+    return mini
+        
 def translator():
     rospy.init_node('translator', anonymous=True)
     pub = rospy.Publisher('bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
