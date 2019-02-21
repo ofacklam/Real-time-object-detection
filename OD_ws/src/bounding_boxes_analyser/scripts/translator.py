@@ -16,7 +16,6 @@ import numpy
 from visualization_msgs.msg import Marker, MarkerArray
 
 #Reste a faire
-    # trouver une profondeur plus precise (faire plusieurs essais avec des tables)
     # rajouter de quoi evaluer temporellement les performances
     # detecter les personnes pour en faire une exception avec un seuil d'acceptation
 
@@ -27,6 +26,8 @@ def callback(image_yolo,prof,pub,pubRViz):
     l = len(image_yolo.bounding_boxes)
     tab = []
     tabRViz = []
+    depth_time = []
+    yolo_time = []
     for i in range(l):
         # camera -> robot
         # x -> -y
@@ -40,11 +41,12 @@ def callback(image_yolo,prof,pub,pubRViz):
 
         point1.z = 0
         point2.z = 0
-
+        
+        start = rospy.get_rostime()
         depth = depth3(box,prof)
-        print(depth)
         point1.x = depth
         point2.x = depth
+        end = rospy.get_rostime()
 
         widthm = 2*depth    #On ne multiplie pas par tan(FOV/2) car cette quantite vaut 1 ici
         point1.y = widthm*(0.5-box.xmin/float(prof.width))
@@ -60,19 +62,32 @@ def callback(image_yolo,prof,pub,pubRViz):
         # d autres champs de l instance a completer
         
         #Pour la visualisation sous RViz
-        mark = Marker()
-        mark.id = i
-        mark.header = obs.header
-        mark.ns = 'obstacles'
-        mark.type = Marker.LINE_STRIP
-        mark.action = Marker.ADD
-        mark.points = poly.points
-        mark.scale.x = 0.2
-        mark.color.g = 1
-        mark.color.a = 1
-        tabRViz.append(mark)
+#        mark = Marker()
+#        mark.id = i
+#        mark.header = obs.header
+#        mark.ns = 'obstacles'
+#        mark.type = Marker.LINE_STRIP
+#        mark.action = Marker.ADD
+#        mark.points = poly.points
+#        mark.scale.x = 0.2
+#        mark.color.g = 1
+#        mark.color.a = 1
+#        tabRViz.append(mark)
 
         tab.append(obs)
+        depth_time.append(end - start)
+        yolo_time.append(image_yolo.header.stamp - prof.header.stamp)
+        print('depth: ' + str(depth))
+        print('depth time: ' + str(depth_time[-1]))
+        # Cette valeur est souvent nulle mais la depth change bien
+        # Le reste des temps sont plutot de l ordre du million
+        print ('yolo_time: ' + str(yolo_time[-1]))
+        # Cette valeur est souvent negative => ont ne compare pas les bonnes images 
+        # => continuite donc a une ou deux image pres ce n est pas tres grave
+        # Une selection par image plutot que par temps n'est pas top
+        # On peut changer l'integration de ros pour avoir les 2 memes time stamp
+        print
+        
 
     msg = ObstacleArrayMsg()
     msg.header = prof.header
