@@ -41,7 +41,7 @@ def callback(image_yolo,prof,pub,pubRViz):
         point1.z = 0
         point2.z = 0
 
-        depth = depth2(box,prof)
+        depth = depth3(box,prof)
         print(depth)
         point1.x = depth
         point2.x = depth
@@ -127,20 +127,20 @@ def depth3(box,prof):
     
 def depth4(box,prof):
     #Renvoie la profondeur minimale sur une croix x
-    #Cancer, ne fonctionne pas bien (sortie du tableau)
     mini = depth(box.xmin,box.ymin,prof)
     m = (box.ymax - box.ymin)/float(box.xmax - box.xmin)
-    p = -m*box.xmax + box.ymax
-    for x in range(box.xmin,box.xmax-1):
-        current_depth = depth(x,int(m*x + p),prof)
+    y1 = box.ymin
+    y2 = box.ymax - 1
+    x = box.xmin
+    while y1 < box.ymax and y2 > box.ymin and x < box.xmax:
+        current_depth1 = depth(x,int(y1),prof)
+        current_depth2 = depth(x,int(y2),prof)
+        current_depth = min (current_depth1,current_depth2)
         if current_depth < mini:
             mini = current_depth
-    m = -m
-    p = -m*box.xmax + box.ymin
-    for x in range(box.xmin,box.xmax-1):
-        current_depth = depth(x,int(m*x + p),prof)
-        if current_depth < mini:
-            mini = current_depth
+        y1 += m
+        y2 -= m
+        x += 1
     return mini
 
 def depth5(box,prof):
