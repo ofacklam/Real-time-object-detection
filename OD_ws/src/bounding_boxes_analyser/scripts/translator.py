@@ -13,6 +13,7 @@ import math
 import struct
 import random
 import numpy
+import time
 from visualization_msgs.msg import Marker, MarkerArray
 
 #Reste a faire
@@ -38,15 +39,15 @@ def callback(image_yolo,prof,pub,pubRViz):
 
         point1 = Point32()
         point2 = Point32()
-
+       
         point1.z = 0
         point2.z = 0
         
-        start = rospy.get_rostime()
-        depth = depth3(box,prof)
+        start = time.time()
+        depth = depth2(box,prof)
         point1.x = depth
         point2.x = depth
-        end = rospy.get_rostime()
+        end = time.time()
 
         widthm = 2*depth    #On ne multiplie pas par tan(FOV/2) car cette quantite vaut 1 ici
         point1.y = widthm*(0.5-box.xmin/float(prof.width))
@@ -76,18 +77,17 @@ def callback(image_yolo,prof,pub,pubRViz):
 
         tab.append(obs)
         depth_time.append(end - start)
-        yolo_time.append(image_yolo.header.stamp - prof.header.stamp)
+        yolo_time.append(image_yolo.header.stamp - image_yolo.image_header.stamp)
+        delta = (image_yolo.image_header.stamp - prof.header.stamp)
         print('depth: ' + str(depth))
-        print('depth time: ' + str(depth_time[-1]))
-        # Cette valeur est souvent nulle mais la depth change bien
-        # Le reste des temps sont plutot de l ordre du million
-        print ('yolo_time: ' + str(yolo_time[-1]))
+        print('depth time (en s): ' + str(depth_time[-1]))
+        print('yolo_time (en ns): ' + str(yolo_time[-1]))
+        print('delta zed: ' + str(delta))
         # Cette valeur est souvent negative => ont ne compare pas les bonnes images 
         # => continuite donc a une ou deux image pres ce n est pas tres grave
         # Une selection par image plutot que par temps n'est pas top
         # On peut changer l'integration de ros pour avoir les 2 memes time stamp
-        print
-        
+        print 
 
     msg = ObstacleArrayMsg()
     msg.header = prof.header
