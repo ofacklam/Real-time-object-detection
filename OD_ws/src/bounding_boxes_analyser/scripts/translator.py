@@ -44,7 +44,7 @@ def callback(image_yolo,prof,pub,pubRViz):
         point2.z = 0
         
         start = time.time()
-        depth = depth2(box,prof)
+        depth = depthNumpy(box,prof)
         point1.x = depth
         point2.x = depth
         end = time.time()
@@ -107,6 +107,14 @@ def depth(x,y,prof):
     if numpy.isnan(depth) or numpy.isinf(depth):
         return numpy.inf
     return depth
+
+def depthNumpy(box,prof):
+    #Renvoie la profondeur minimale
+    ba = bytearray(prof.data)
+    depthmap = numpy.frombuffer(ba,dtype=numpy.float32)
+    depthmap = depthmap.reshape((prof.width,prof.height))
+    depthmap = depthmap[box.xmin:box.xmax,box.ymin:box.ymax]
+    return numpy.nanmin(numpy.abs(depthmap))
 
 def depth1(box,prof):
     #Renvoie la profondeur du centre
