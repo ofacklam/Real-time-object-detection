@@ -112,8 +112,8 @@ def depthNumpy(box,prof):
     #Renvoie la profondeur minimale
     ba = bytearray(prof.data)
     depthmap = numpy.frombuffer(ba,dtype=numpy.float32)
-    depthmap = depthmap.reshape((prof.width,prof.height))
-    depthmap = depthmap[box.xmin:box.xmax,box.ymin:box.ymax]
+    depthmap = depthmap.reshape((prof.height,prof.width))
+    depthmap = depthmap[box.ymin:box.ymax,box.xmin:box.xmax]
     return numpy.nanmin(numpy.abs(depthmap))
 
 def depth1(box,prof):
