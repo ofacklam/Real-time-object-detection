@@ -4,13 +4,8 @@ tests/*
 backup/
 backup/*
 
-OD_ws/build/
-OD_ws/build/*
-OD_ws/devel/
-OD_ws/devel/*
+zed-ros-wrapper/
+zed-ros-wrapper/*
 
-OD_ws/src/zed-ros-wrapper/
-OD_ws/src/zed-ros-wrapper/*
-
-OD_ws/src/darknet_ros/
-OD_ws/src/darknet_ros/*
+darknet_ros/
+darknet_ros/*
