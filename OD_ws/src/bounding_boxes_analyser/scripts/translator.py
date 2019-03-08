@@ -77,12 +77,10 @@ def callback(image_yolo,prof,pub,pubRViz):
 
         tab.append(obs)
         depth_time.append(end - start)
-        yolo_time.append(image_yolo.header.stamp - image_yolo.image_header.stamp)
-        delta = (image_yolo.image_header.stamp - prof.header.stamp)
+        yolo_time.append(image_yolo.image_header.stamp - image_yolo.header.stamp)
         print('depth: ' + str(depth))
         print('depth time (en s): ' + str(depth_time[-1]))
         print('yolo_time (en ns): ' + str(yolo_time[-1]))
-        print('delta zed: ' + str(delta))
         # Cette valeur est souvent negative => ont ne compare pas les bonnes images 
         # => continuite donc a une ou deux image pres ce n est pas tres grave
         # Une selection par image plutot que par temps n'est pas top
@@ -202,11 +200,11 @@ def translator():
     pub = rospy.Publisher('bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
     pubRViz = rospy.Publisher('bounding_boxes_analyser/marker_vision', MarkerArray, queue_size=10)
     # Publie a la reception de chaque message
-    image_yolo = message_filters.Subscriber('/darknet_ros/bounding_boxes', BoundingBoxes)
+    image_yolo = message_filters.Subscriber('bounding_boxes_analyser/bounding_boxes_converted', BoundingBoxes)
     prof = message_filters.Subscriber('/zed/depth/depth_registered', Image)
     
-    ts = message_filters.ApproximateTimeSynchronizer([image_yolo, prof], 10, 1, allow_headerless=True)
-                                                                # queue_size, slop (delta t en s)
+    ts = message_filters.TimeSynchronizer([image_yolo, prof], 10)
+                                                             # queue_size
     ts.registerCallback(lambda x,y: callback(x,y,pub,pubRViz))
 
     # spin() simply keeps python from exiting until this node is stopped
