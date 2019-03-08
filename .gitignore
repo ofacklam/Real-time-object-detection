@@ -6,6 +6,3 @@ backup/*
 
 zed-ros-wrapper/
 zed-ros-wrapper/*
-
-darknet_ros/
-darknet_ros/*
