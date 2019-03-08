@@ -22,6 +22,7 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 FOV = math.pi/2 # field of view en radian
 repere = 'zed_left_camera_frame'
+profondeur = 1 #profondeur de la boite renvoyee
 
 def callback(image_yolo,prof,pub,pubRViz):
     l = len(image_yolo.bounding_boxes)
@@ -29,6 +30,11 @@ def callback(image_yolo,prof,pub,pubRViz):
     tabRViz = []
     depth_time = []
     yolo_time = []
+    mark = Marker()
+    mark.action = Marker.DELETEALL
+    markers = MarkerArray()
+    markers.markers = [mark]
+    pubRViz.publish(markers)
     for i in range(l):
         # camera -> robot
         # x -> -y
@@ -39,22 +45,30 @@ def callback(image_yolo,prof,pub,pubRViz):
 
         point1 = Point32()
         point2 = Point32()
+        point3 = Point32()
+        point4 = Point32()
        
         point1.z = 0
         point2.z = 0
+        point3.z = 0
+        point4.z = 0
         
         start = time.time()
         depth = depthNumpy(box,prof)
         point1.x = depth
         point2.x = depth
+        point3.x = depth+profondeur
+        point4.x = depth+profondeur
         end = time.time()
 
         widthm = 2*depth    #On ne multiplie pas par tan(FOV/2) car cette quantite vaut 1 ici
         point1.y = widthm*(0.5-box.xmin/float(prof.width))
         point2.y = widthm*(0.5-box.xmax/float(prof.width))
+        point3.y = point2.y
+        point4.y = point1.y
 
         poly = Polygon()
-        poly.points = [point1, point2]
+        poly.points = [point1, point2, point3, point4, point1]
 
         obs = ObstacleMsg()
         obs.header = prof.header
@@ -63,17 +77,17 @@ def callback(image_yolo,prof,pub,pubRViz):
         # d autres champs de l instance a completer
         
         #Pour la visualisation sous RViz
-#        mark = Marker()
-#        mark.id = i
-#        mark.header = obs.header
-#        mark.ns = 'obstacles'
-#        mark.type = Marker.LINE_STRIP
-#        mark.action = Marker.ADD
-#        mark.points = poly.points
-#        mark.scale.x = 0.2
-#        mark.color.g = 1
-#        mark.color.a = 1
-#        tabRViz.append(mark)
+        mark = Marker()
+        mark.id = i
+        mark.header = obs.header
+        mark.ns = 'obstacles'
+        mark.type = Marker.LINE_STRIP
+        mark.action = Marker.ADD
+        mark.points = poly.points
+        mark.scale.x = 0.2
+        mark.color.g = 1
+        mark.color.a = 1
+        tabRViz.append(mark)
 
         tab.append(obs)
         depth_time.append(end - start)
