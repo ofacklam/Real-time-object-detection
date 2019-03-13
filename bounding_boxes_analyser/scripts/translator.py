@@ -27,14 +27,14 @@ profondeur = 1 #profondeur de la boite renvoyee
 def callback(image_yolo,prof,pub,pubRViz):
     l = len(image_yolo.bounding_boxes)
     tab = []
-    tabRViz = []
+#    tabRViz = []
     depth_time = []
     yolo_time = []
-    mark = Marker()
-    mark.action = Marker.DELETEALL
-    markers = MarkerArray()
-    markers.markers = [mark]
-    pubRViz.publish(markers)
+#    mark = Marker()
+#    mark.action = Marker.DELETEALL
+#    markers = MarkerArray()
+#    markers.markers = [mark]
+#    pubRViz.publish(markers)
     for i in range(l):
         # camera -> robot
         # x -> -y
@@ -77,17 +77,17 @@ def callback(image_yolo,prof,pub,pubRViz):
         # d autres champs de l instance a completer
         
         #Pour la visualisation sous RViz
-        mark = Marker()
-        mark.id = i
-        mark.header = obs.header
-        mark.ns = 'obstacles'
-        mark.type = Marker.LINE_STRIP
-        mark.action = Marker.ADD
-        mark.points = poly.points
-        mark.scale.x = 0.2
-        mark.color.g = 1
-        mark.color.a = 1
-        tabRViz.append(mark)
+#        mark = Marker()
+#        mark.id = i
+#        mark.header = obs.header
+#        mark.ns = 'obstacles'
+#        mark.type = Marker.LINE_STRIP
+#        mark.action = Marker.ADD
+#        mark.points = poly.points
+#        mark.scale.x = 0.2
+#        mark.color.g = 1
+#        mark.color.a = 1
+#        tabRViz.append(mark)
 
         tab.append(obs)
         depth_time.append(end - start)
@@ -107,9 +107,9 @@ def callback(image_yolo,prof,pub,pubRViz):
 
     pub.publish(msg)
     
-    msgRViz = MarkerArray()
-    msgRViz.markers = tabRViz
-    pubRViz.publish(msgRViz)
+#    msgRViz = MarkerArray()
+#    msgRViz.markers = tabRViz
+#    pubRViz.publish(msgRViz)
 
 def depth(x,y,prof):
     #Renvoie la profondeur du point de coordonees (x,y)
