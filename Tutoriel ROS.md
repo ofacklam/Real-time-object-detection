@@ -140,3 +140,7 @@ Ctrl+C pour arrêter l'enregistrement
 rosbag info nom_du_rosbag            donne les info sur le rosbag comme la date de prise ou sa taille
 rosbag play -s 5 -r 2 nom_du_rosbag  joue le rosbag depuis l'instant 5 à la vitesse x2
 ```
+
+### Temps simulé
+- Avant de lancer des noeuds (mais apres avoir lancer `roscore`), activer le temps simulé : `rosparam set use_sim_time true`
+- Lancer les bags avec l'option `--clock`
