@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<launch>
+  <!-- Start header_converter -->
+  <node pkg="bounding_boxes_analyser" type="header_converter.py" name="header_converter"/>
+
+  <!-- Start translator -->
+  <node pkg="bounding_boxes_analyser" type="translator.py" name="translator" output="screen"/>
+</launch>

@@ -23,8 +23,6 @@ cd src
 ## Configuration de `darknet_ros` [optionnel]
 
 - Le répertoire `src/darknet_ros/darknet_ros/config` contient les fichiers de configuration du wrapper ROS pour YOLO et de l'algo YOLO lui-meme.
-- Dans le fichier `ros.yaml` : 
-	- dans la section `image_view` le champ `enable_opencv` permet d'activer la vidéo en temps réel (a désactiver en production).
 - On peut rajouter des fichiers de configuration de YOLO (par exemple pour utiliser des configs et poids différents). Il faut alors aussi réécrire les fichiers de lancement. (cf docu de `darknet_ros`)
 
 ## Lancer le projet
@@ -33,7 +31,8 @@ cd src
 	- seule : `roslaunch zed_wrapper zed.launch`
 	- avec rViz pour la visualisation : `roslaunch zed_display_rviz display.launch`
 - Pour lancer YOLO :
-	- yolov2-tiny : `roslaunch darknet_ros darknet_ros.launch`
+	- yolov2-tiny (avec OpenCV) : `roslaunch darknet_ros darknet_ros.launch`
+	- yolov2-tiny (sans OpenCV) : `roslaunch darknet_ros darknet_ros.opencv_disabled.launch`
 	- yolov3 : `roslaunch darknet_ros yolo_v3.launch`
 - Pour lancer la traduction : `roslaunch bounding_boxes_analyser analyser.launch`
 - Lien stratus vers les rosbags tests : https://stratus.binets.fr/s/QCEoQPeoXkrRcJP
