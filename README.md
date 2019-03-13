@@ -6,22 +6,26 @@ Projet de détection et suivi d'objet en temps réel pour permettre l'évitement
 ## Configuration du projet
 
 - Installer les dépendances de la caméra (cf. ci-dessous)
-- Cloner le repository en executant `git clone https://github.com/ofacklam/Real-time-object-detection.git`
-- Aller dans le dossier source `cd Real-time-object-detection/OD_ws/src`
+- Créer un workspace catkin et aller dans le dossier `src` :
+```
+mkdir OD_ws
+cd OD_ws
+mkdir src
+cd src
+```
+- Cloner le repository récursivement en executant `git clone --recursive https://github.com/ofacklam/Real-time-object-detection.git`
 - Cloner le repository de zed-ros-wrapper (le module qui integre la caméra ZED dans ROS) `git clone https://github.com/stereolabs/zed-ros-wrapper.git`
-- Cloner le repository de `darknet_ros` récursivement : `git clone --recursive https://github.com/leggedrobotics/darknet_ros.git`
 - Revenir dans le workspace `cd ..`
 - Compiler le projet `catkin_make -DCMAKE_BUILD_TYPE=Release`
 	- Si on obtient une erreur `no module named em`, il faut désinstaller `em` avec `pip uninstall em` et install `empy` avec `pip install empy`
-- Activer l'environnement (cf Tutoriel ROS) en rajoutant `source ~/Real-time-object-detection/OD_ws/devel/setup.bash` a la fin du fichier `~/.bashrc`
+- Activer l'environnement (cf Tutoriel ROS) en rajoutant `source <path/to/OD_ws>/devel/setup.bash` a la fin du fichier `~/.bashrc`
 
-## Configuration de `darknet_ros`
+## Configuration de `darknet_ros` [optionnel]
 
 - Le répertoire `src/darknet_ros/darknet_ros/config` contient les fichiers de configuration du wrapper ROS pour YOLO et de l'algo YOLO lui-meme.
 - Dans le fichier `ros.yaml` : 
-	- il faut modifier le topic que YOLO va lire : affecter a `camera_reading` le topic `/zed/rgb/image_raw_color`
 	- dans la section `image_view` le champ `enable_opencv` permet d'activer la vidéo en temps réel (a désactiver en production).
-- [Optionnel] On peut rajouter des fichiers de configuration de YOLO (par exemple pour utiliser des configs et poids différents). Il faut alors aussi réécrire les fichiers de lancement. (cf docu de `darknet_ros`)
+- On peut rajouter des fichiers de configuration de YOLO (par exemple pour utiliser des configs et poids différents). Il faut alors aussi réécrire les fichiers de lancement. (cf docu de `darknet_ros`)
 
 ## Lancer le projet
 
@@ -31,6 +35,7 @@ Projet de détection et suivi d'objet en temps réel pour permettre l'évitement
 - Pour lancer YOLO :
 	- yolov2-tiny : `roslaunch darknet_ros darknet_ros.launch`
 	- yolov3 : `roslaunch darknet_ros yolo_v3.launch`
+- Pour lancer la traduction : `roslaunch bounding_boxes_analyser analyser.launch`
 - Lien stratus vers les rosbags tests : https://stratus.binets.fr/s/QCEoQPeoXkrRcJP
 	- Lancer YOLO puis le rosbag
 
@@ -67,7 +72,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PAT
 
 ### Installation du ZED SDK
 
-- Télécharger l'installateur sur https://www.stereolabs.com/developers/release/2.6/
+- Télécharger l'installateur sur https://www.stereolabs.com/developers/release/2.7/ (la version Ubuntu 16)
 - Le lancer (avec le bon nom de fichier bien sur) avec 
 ```
 chmod +x ZED_SDK_Linux_*.run 
