@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # Revision $Id$
 
+# Ce noeud trie les objets renvoyés par yolo et les transforment en ObstacleArrayMsg
 
 import rospy
 from darknet_ros_msgs.msg import BoundingBoxes
@@ -18,7 +19,6 @@ from visualization_msgs.msg import Marker, MarkerArray
 
 #Reste a faire
     # rajouter de quoi evaluer temporellement les performances
-    # detecter les personnes pour en faire une exception avec un seuil d'acceptation
 
 FOV = math.pi/2 # field of view en radian
 repere = 'zed_left_camera_frame'
