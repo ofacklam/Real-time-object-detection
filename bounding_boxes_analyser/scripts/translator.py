@@ -23,18 +23,20 @@ from visualization_msgs.msg import Marker, MarkerArray
 FOV = math.pi/2 # field of view en radian
 repere = 'zed_left_camera_frame'
 profondeur = 1 #profondeur de la boite renvoyee
+prob_personne = 0.7 #sueil de detection pour les personnes
 
-def callback(image_yolo,prof,pub,pubRViz):
+def callback(image_yolo,prof,pub,pub_pers,pubRViz):
     l = len(image_yolo.bounding_boxes)
     tab = []
-#    tabRViz = []
+    tab_pers=[]
+    tabRViz = []
     depth_time = []
     yolo_time = []
-#    mark = Marker()
-#    mark.action = Marker.DELETEALL
-#    markers = MarkerArray()
-#    markers.markers = [mark]
-#    pubRViz.publish(markers)
+    mark = Marker()
+    mark.action = Marker.DELETEALL
+    markers = MarkerArray()
+    markers.markers = [mark]
+    pubRViz.publish(markers)
     for i in range(l):
         # camera -> robot
         # x -> -y
@@ -75,21 +77,7 @@ def callback(image_yolo,prof,pub,pubRViz):
         obs.header.frame_id = repere
         obs.polygon = poly
         # d autres champs de l instance a completer
-        
-        #Pour la visualisation sous RViz
-#        mark = Marker()
-#        mark.id = i
-#        mark.header = obs.header
-#        mark.ns = 'obstacles'
-#        mark.type = Marker.LINE_STRIP
-#        mark.action = Marker.ADD
-#        mark.points = poly.points
-#        mark.scale.x = 0.2
-#        mark.color.g = 1
-#        mark.color.a = 1
-#        tabRViz.append(mark)
 
-        tab.append(obs)
         depth_time.append(end - start)
         yolo_time.append(image_yolo.image_header.stamp - image_yolo.header.stamp)
         print('depth: ' + str(depth))
@@ -100,16 +88,50 @@ def callback(image_yolo,prof,pub,pubRViz):
         # Une selection par image plutot que par temps n'est pas top
         # On peut changer l'integration de ros pour avoir les 2 memes time stamp
         print 
+        
+        if box.Class == "person" and box.probability > prob_personne:
+            tab_pers.append(obs)
+            #Pour la visualisation sous RViz - les personnes sont en rouge
+            mark = Marker()
+            mark.id = i
+            mark.header = obs.header
+            mark.ns = 'obstacles'
+            mark.type = Marker.LINE_STRIP
+            mark.action = Marker.ADD
+            mark.points = poly.points
+            mark.scale.x = 0.2
+            mark.color.r = 1
+            mark.color.a = 1
+            tabRViz.append(mark)
+        else:
+            tab.append(obs)
+            #Pour la visualisation sous RViz - les obstacles sont en vert
+            mark = Marker()
+            mark.id = i
+            mark.header = obs.header
+            mark.ns = 'obstacles'
+            mark.type = Marker.LINE_STRIP
+            mark.action = Marker.ADD
+            mark.points = poly.points
+            mark.scale.x = 0.2
+            mark.color.g = 1
+            mark.color.a = 1
+            tabRViz.append(mark)
 
     msg = ObstacleArrayMsg()
     msg.header = prof.header
     msg.obstacles = tab
 
+    msg_pers = ObstacleArrayMsg()
+    msg_pers.header = prof.header
+    msg_pers.obstacles = tab_pers
+
     pub.publish(msg)
+    pub_pers.publish(msg_pers)
     
-#    msgRViz = MarkerArray()
-#    msgRViz.markers = tabRViz
-#    pubRViz.publish(msgRViz)
+    msgRViz = MarkerArray()
+    msgRViz.markers = tabRViz
+    pubRViz.publish(msgRViz)
 
 def depth(x,y,prof):
     #Renvoie la profondeur du point de coordonees (x,y)
@@ -212,6 +234,7 @@ def depth7(box,prof):
 def translator():
     rospy.init_node('translator', anonymous=True)
     pub = rospy.Publisher('bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
+    pub_pers = rospy.Publisher('bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, queue_size=10)
     pubRViz = rospy.Publisher('bounding_boxes_analyser/marker_vision', MarkerArray, queue_size=10)
     # Publie a la reception de chaque message
     image_yolo = message_filters.Subscriber('bounding_boxes_analyser/bounding_boxes_converted', BoundingBoxes)
@@ -219,7 +242,7 @@ def translator():
     
     ts = message_filters.TimeSynchronizer([image_yolo, prof], 10)
                                                              # queue_size
-    ts.registerCallback(lambda x,y: callback(x,y,pub,pubRViz))
+    ts.registerCallback(lambda x,y: callback(x,y,pub,pub_pers,pubRViz))
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
