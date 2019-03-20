@@ -9,6 +9,7 @@ from geometry_msgs.msg import Polygon, Point32
 import numpy
 
 # Mettre un identifiant sur la personne suivie
+# Trouver un processus de validation de la personne choisie pour être suivie
 
 # Valeurs initiales du centre et de la vitesse de la personne suivie
 speed = numpy.array([0,0])
@@ -17,6 +18,7 @@ center = numpy.array([0,0])
 def callback(persons,pub,pub_obs):
     tab_pers = persons.obstacles
     if len(tab_pers == 1):
+        
         pub.publish(tab_pers[0])
         global speed
         global center
@@ -24,17 +26,22 @@ def callback(persons,pub,pub_obs):
         center = calculate_center(tab_pers[0].poly)
         speed = center - tmp
     if len(tab_pers) > 1:
+        #Finding the person to follow
         global speed
         global center
-        expected_center = center + speed
+        expected_center = numpy.add(center,speed)
         centers = numpy.array([calculate_center(obs) for obs in tab_pers])
         delta = numpy.abs(numpy.substract(centers,expected_center))
         index = numpy.argmin(delta)
-        pub.publish(tab_pers[index])
+        #Updating info about the target
         tmp = center
         center = centers[index]
         speed = center - tmp
-        pub_obs
+        tab_pers[index].id = 1
+        #Publishing the target as following and the others as obstacles
+        pub.publish(tab_pers[index])
+        persons.obstacles = tab_pers[:index] + tab_pers[index+1:]
+        pub_obs.publish(persons)
         
 def calculate_center(obs):
     polygon = obs.polygon
