@@ -12,25 +12,30 @@ import numpy
 # Trouver un processus de validation de la personne choisie pour etre suivie
 
 # Valeurs initiales du centre et de la vitesse de la personne suivie
-global speed
-global center
 speed = numpy.array([0,0])
 center = numpy.array([0,0])
 
 def callback(persons,pub,pub_obs):
     tab_pers = persons.obstacles
-    if len(tab_pers == 1):
+    if len(tab_pers) == 1:
         #Chooses the only person available
         pub.publish(tab_pers[0])
+        global speed
+        global center
         tmp = center
-        center = calculate_center(tab_pers[0].poly)
+        center = calculate_center(tab_pers[0])
         speed = center - tmp
     if len(tab_pers) > 1:
         #Finding the person to follow
+        global speed
+        global center
         expected_center = numpy.add(center,speed)
         centers = numpy.array([calculate_center(obs) for obs in tab_pers])
-        delta = numpy.abs(numpy.substract(centers,expected_center))
-        index = numpy.argmin(delta)
+        dist2 = []
+        for i in range(len(centers)):
+            delta = numpy.subtract(centers[i],expected_center)
+            dist2.append(delta[0]*delta[0]+delta[1]*delta[1])
+        index = numpy.argmin(dist2)
         #Updating info about the target
         tmp = center
         center = centers[index]
