@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # Revision $Id$
 
-# Ce noeud trie les objets renvoyés par yolo et les transforment en ObstacleArrayMsg
+# Ce noeud trie les objets renvoyes par yolo et les transforment en ObstacleArrayMsg
 
 import rospy
 from darknet_ros_msgs.msg import BoundingBoxes
