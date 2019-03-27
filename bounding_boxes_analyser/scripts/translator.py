@@ -21,7 +21,7 @@ from visualization_msgs.msg import Marker, MarkerArray
     # rajouter de quoi evaluer temporellement les performances
 
 FOV = math.pi/2 # field of view en radian
-repere = 'asus_camera_link' #changer en "zed_left_camera_frame"
+repere = '/asus_camera_link' #changer en "zed_left_camera_frame"
 profondeur = 1 #profondeur de la boite renvoyee
 prob_personne = 0.7 #sueil de detection pour les personnes
 #Identifiant pour les obstacles
@@ -239,11 +239,11 @@ def depth7(box,prof):
         
 def translator():
     rospy.init_node('translator', anonymous=True)
-    pub = rospy.Publisher('bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
-    pub_pers = rospy.Publisher('bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, queue_size=10)
-    pubRViz = rospy.Publisher('bounding_boxes_analyser/marker_vision', MarkerArray, queue_size=10)
+    pub = rospy.Publisher('/bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
+    pub_pers = rospy.Publisher('/bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, queue_size=10)
+    pubRViz = rospy.Publisher('/bounding_boxes_analyser/marker_vision', MarkerArray, queue_size=10)
     # Publie a la reception de chaque message
-    image_yolo = message_filters.Subscriber('bounding_boxes_analyser/bounding_boxes_converted', BoundingBoxes)
+    image_yolo = message_filters.Subscriber('/bounding_boxes_analyser/bounding_boxes_converted', BoundingBoxes)
     prof = message_filters.Subscriber('/zed/depth/depth_registered', Image)
     
     ts = message_filters.TimeSynchronizer([image_yolo, prof], 10)
