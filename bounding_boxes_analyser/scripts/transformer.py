@@ -16,7 +16,7 @@ def callback(obstacle_array, pub):
 	permanent_obstacles_odom = tf_manager.transformObstArrayFrame(transform_repere_to_odom, obstacle_array)
 	pub.publish(permanent_obstacles_odom)
 
-def transfomer():
+def transformer():
     rospy.init_node('transformer', anonymous=True)
     pub = rospy.Publisher('/ultrasonic_sensors/obstacles', ObstacleArrayMsg, queue_size=10)
     # Publie a la reception de chaque message
