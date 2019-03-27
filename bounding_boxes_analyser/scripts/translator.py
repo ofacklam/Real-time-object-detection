@@ -120,6 +120,7 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
 
     msg = ObstacleArrayMsg()
     msg.header = prof.header
+	msg.header.frame_id = repere
     msg.obstacles = tab
 
     msg_pers = ObstacleArrayMsg()
