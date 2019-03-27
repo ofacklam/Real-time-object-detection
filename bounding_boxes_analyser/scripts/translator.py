@@ -21,7 +21,7 @@ from visualization_msgs.msg import Marker, MarkerArray
     # rajouter de quoi evaluer temporellement les performances
 
 FOV = math.pi/2 # field of view en radian
-repere = 'zed_left_camera_frame'
+repere = 'asus_camera_link'
 profondeur = 1 #profondeur de la boite renvoyee
 prob_personne = 0.7 #sueil de detection pour les personnes
 
