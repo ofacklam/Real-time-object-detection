@@ -5,9 +5,12 @@
 # et publie dans le topic analyser par le gestionnaire de trajectoire du robot
 
 from uai_utils.ros_utils.tf_manager import NavTFManager
-tf_manager = NavTFManager()
+import rospy
+from std_msgs.msg import Header
+from costmap_converter.msg import ObstacleArrayMsg, ObstacleMsg
 
 def callback(obstacle_array, pub):
+	tf_manager = NavTFManager()
 	repere = obstacle_array.header.frame_id
 	transform_repere_to_odom = tf_manager.lookout_transform_stamped(repere,"/odom")
 	permanent_obstacles_odom = tf_manager.transformObstArrayFrame(transform_repere_to_odom, obstacle_array)
