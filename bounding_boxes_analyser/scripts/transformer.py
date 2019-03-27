@@ -12,7 +12,7 @@ from costmap_converter.msg import ObstacleArrayMsg, ObstacleMsg
 def callback(obstacle_array, pub):
 	tf_manager = NavTFManager()
 	repere = obstacle_array.header.frame_id
-	transform_repere_to_odom = tf_manager.lookup_transform_stamped(repere,"/odom")
+	transform_repere_to_odom = tf_manager.lookup_transform_stamped("/odom",repere)
 	permanent_obstacles_odom = tf_manager.transformObstArrayFrame(transform_repere_to_odom, obstacle_array)
 	pub.publish(permanent_obstacles_odom)
 
