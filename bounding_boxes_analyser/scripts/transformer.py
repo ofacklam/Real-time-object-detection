@@ -20,8 +20,8 @@ def transformer():
     rospy.init_node('transformer', anonymous=True)
     pub = rospy.Publisher('/ultrasonic_sensors/obstacles', ObstacleArrayMsg, queue_size=10)
     # Publie a la reception de chaque message
-    rospy.Suscriber('/bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, lambda x: callback(x,pub))
-    rospy.Suscriber('/bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, lambda x: callback(x,pub))
+    rospy.Subscriber('/bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, lambda x: callback(x,pub))
+    rospy.Subscriber('/bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, lambda x: callback(x,pub))
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
