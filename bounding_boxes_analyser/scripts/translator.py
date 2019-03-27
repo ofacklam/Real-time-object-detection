@@ -21,9 +21,12 @@ from visualization_msgs.msg import Marker, MarkerArray
     # rajouter de quoi evaluer temporellement les performances
 
 FOV = math.pi/2 # field of view en radian
-repere = 'asus_camera_link'
+repere = 'asus_camera_link' #changer en "zed_left_camera_frame"
 profondeur = 1 #profondeur de la boite renvoyee
 prob_personne = 0.7 #sueil de detection pour les personnes
+#Identifiant pour les obstacles
+PERSON = 1
+OBSTACLE = 0
 
 def callback(image_yolo,prof,pub,pub_pers,pubRViz):
     l = len(image_yolo.bounding_boxes)
@@ -90,6 +93,7 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
         print 
         
         if box.Class == "person" and box.probability > prob_personne:
+			obs.id = PERSON
             tab_pers.append(obs)
             #Pour la visualisation sous RViz - les personnes sont en rouge
             mark = Marker()
@@ -104,6 +108,7 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
             mark.color.a = 1
             tabRViz.append(mark)
         else:
+			obs.id = OBSTACLE
             tab.append(obs)
             #Pour la visualisation sous RViz - les obstacles sont en vert
             mark = Marker()
@@ -122,7 +127,7 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
     msg.header = prof.header
 	msg.header.frame_id = repere
     msg.obstacles = tab
-
+	
     msg_pers = ObstacleArrayMsg()
     msg_pers.header = prof.header
     msg_pers.obstacles = tab_pers
