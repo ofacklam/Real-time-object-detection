@@ -58,10 +58,10 @@ def calculate_center(obs):
         
 def follower():
     rospy.init_node('follower', anonymous=True)
-    pub = rospy.Publisher('bounding_boxes_analyser/following', ObstacleMsg, queue_size=10)
-    pub_obs = rospy.Publisher('bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
+    pub = rospy.Publisher('/bounding_boxes_analyser/following', ObstacleMsg, queue_size=10)
+    pub_obs = rospy.Publisher('/bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
     # Publie a la reception de chaque message
-    rospy.Subscriber('bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, lambda x: callback(x,pub,pub_obs))
+    rospy.Subscriber('/bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, lambda x: callback(x,pub,pub_obs))
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
 
