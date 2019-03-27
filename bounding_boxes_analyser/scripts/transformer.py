@@ -2,6 +2,7 @@
 # Revision $Id$
 
 # Ce noeud effectue un changement de repere pour publie dans le repere "odom"
+# et publie dans le topic analyser par le gestionnaire de trajectoire du robot
 
 from uai_utils.ros_utils.tf_manager import NavTFManager
 tf_manager = NavTFManager()
