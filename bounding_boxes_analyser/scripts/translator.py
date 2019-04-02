@@ -15,10 +15,6 @@ import struct
 import random
 import numpy
 import time
-from visualization_msgs.msg import Marker, MarkerArray
-
-#Reste a faire
-    # rajouter de quoi evaluer temporellement les performances
 
 FOV = math.pi/2 # field of view en radian
 repere = '/asus_camera_link' #changer en "zed_left_camera_frame" pour faire de la visualisation
@@ -28,24 +24,19 @@ prob_personne = 0.7 #sueil de detection pour les personnes
 PERSON = 1
 OBSTACLE = 0
 
-def callback(image_yolo,prof,pub,pub_pers,pubRViz):
+def callback(image_yolo,prof,pub,pub_pers):
     l = len(image_yolo.bounding_boxes)
     tab = []
     tab_pers=[]
-    tabRViz = []
     depth_time = []
     yolo_time = []
-    mark = Marker()
-    mark.action = Marker.DELETEALL
-    markers = MarkerArray()
-    markers.markers = [mark]
-    pubRViz.publish(markers)
+
     for i in range(l):
-        # camera -> robot
+        # image -> repere de la camera
         # x -> -y
         # y -> -z
         # z -> x
-        # les messages sont enregistres dans le repere de la camera nomme: 'zed_left_camera_frame' stocke dans repere
+        # les messages sont enregistres dans le repere de la camera nomme: 'zed_left_camera_frame'/'asus_camera_link' stocke dans repere
         box = image_yolo.bounding_boxes[i]
 
         point1 = Point32()
@@ -95,33 +86,9 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
         if box.Class == "person" and box.probability > prob_personne:
             obs.id = PERSON
             tab_pers.append(obs)
-            #Pour la visualisation sous RViz - les personnes sont en rouge
-            mark = Marker()
-            mark.id = i
-            mark.header = obs.header
-            mark.ns = 'obstacles'
-            mark.type = Marker.LINE_STRIP
-            mark.action = Marker.ADD
-            mark.points = poly.points
-            mark.scale.x = 0.2
-            mark.color.r = 1
-            mark.color.a = 1
-            tabRViz.append(mark)
         else:
             obs.id = OBSTACLE
             tab.append(obs)
-            #Pour la visualisation sous RViz - les obstacles sont en vert
-            mark = Marker()
-            mark.id = i
-            mark.header = obs.header
-            mark.ns = 'obstacles'
-            mark.type = Marker.LINE_STRIP
-            mark.action = Marker.ADD
-            mark.points = poly.points
-            mark.scale.x = 0.2
-            mark.color.g = 1
-            mark.color.a = 1
-            tabRViz.append(mark)
 
     msg = ObstacleArrayMsg()
     msg.header = prof.header
@@ -130,14 +97,11 @@ def callback(image_yolo,prof,pub,pub_pers,pubRViz):
 	
     msg_pers = ObstacleArrayMsg()
     msg_pers.header = prof.header
+    msg_pers.header.frame_id = repere
     msg_pers.obstacles = tab_pers
 
     pub.publish(msg)
     pub_pers.publish(msg_pers)
-    
-    msgRViz = MarkerArray()
-    msgRViz.markers = tabRViz
-    pubRViz.publish(msgRViz)
 
 def depth(x,y,prof):
     #Renvoie la profondeur du point de coordonees (x,y)
@@ -241,14 +205,13 @@ def translator():
     rospy.init_node('translator', anonymous=True)
     pub = rospy.Publisher('/bounding_boxes_analyser/yolo_obstacles_messages', ObstacleArrayMsg, queue_size=10)
     pub_pers = rospy.Publisher('/bounding_boxes_analyser/yolo_persons_messages', ObstacleArrayMsg, queue_size=10)
-    pubRViz = rospy.Publisher('/bounding_boxes_analyser/marker_vision', MarkerArray, queue_size=10)
     # Publie a la reception de chaque message
     image_yolo = message_filters.Subscriber('/bounding_boxes_analyser/bounding_boxes_converted', BoundingBoxes)
     prof = message_filters.Subscriber('/zed/depth/depth_registered', Image)
     
     ts = message_filters.TimeSynchronizer([image_yolo, prof], 10)
                                                              # queue_size
-    ts.registerCallback(lambda x,y: callback(x,y,pub,pub_pers,pubRViz))
+    ts.registerCallback(lambda x,y: callback(x,y,pub,pub_pers))
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()
