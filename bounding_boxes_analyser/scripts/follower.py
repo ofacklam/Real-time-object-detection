@@ -17,18 +17,21 @@ center = numpy.array([0,0])
 
 def callback(persons,pub,pub_obs):
     tab_pers = persons.obstacles
+    global speed
+    global center
     if len(tab_pers) == 1:
         #Chooses the only person available
-        pub.publish(tab_pers[0])
-        global speed
-        global center
+        expected_center = numpy.add(center,speed)
         tmp = center
         center = calculate_center(tab_pers[0])
         speed = center - tmp
+        #Making sense with the error (in m)
+        delta = numpy.subtract(center,expected_center)
+        error = numpy.sqrt(delta[0]*delta[0]+delta[1]*delta[1])
+        print(error)
+        pub.publish(tab_pers[0])
     if len(tab_pers) > 1:
         #Finding the person to follow
-        global speed
-        global center
         expected_center = numpy.add(center,speed)
         centers = numpy.array([calculate_center(obs) for obs in tab_pers])
         dist2 = []
@@ -41,6 +44,9 @@ def callback(persons,pub,pub_obs):
         center = centers[index]
         speed = center - tmp
         tab_pers[index].id = 1
+        #Making sense with the error (in m)
+        error = numpy.sqrt(dist2[index])
+        print(error)
         #Publishing the target as following and the others as obstacles
         pub.publish(tab_pers[index])
         persons.obstacles = tab_pers[:index] + tab_pers[index+1:]
