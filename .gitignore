@@ -6,3 +6,5 @@ backup/*
 
 zed-ros-wrapper/
 zed-ros-wrapper/*
+
+psc.code-workspace/
