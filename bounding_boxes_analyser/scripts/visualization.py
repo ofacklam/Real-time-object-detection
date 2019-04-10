@@ -14,45 +14,56 @@ from visualization_msgs.msg import Marker, MarkerArray
 FOLLOWING = 2
 PERSON = 1
 OBSTACLE = 0
-#repere pour la visualisation
+#Repere pour la visualisation
 repere = '/zed_left_camera_frame'
+#Memoire du nombre de marker affiches
+nb_person_marker = 0
+nb_obs_marker = 0
+del_marker_nb = 0
 
-MAX_OBS = 1000
+MAX_OBS = 100
 
 def callback(obstacle_array, pub):
 	# Les anciennes boxes ne sont pas effacees
 	# On recupere les boxes par type (1 msg pour les personnes et 1 message pour les obstacles)
 	#	ce qui permet de factoriser le code mais empeche la suppression a chaque callback
-	tab = []
 
+	# Default marker for following
 	mark = Marker()
 	mark.ns = 'obstacles'
 	mark.type = Marker.LINE_STRIP
 	mark.action = Marker.ADD
 	mark.scale.x = 0.2
-	mark.color.g = 1
+	mark.color.b = 1
 	mark.color.a = 1
 
 	# Find obstacle type
-	obstacle_type = OBSTACLE
+	obstacle_type = FOLLOWING
+	del_marker_nb = 1
 	if (len(obstacle_array.obstacles) > 0 and obstacle_array.obstacles[0].id == PERSON):
 		obstacle_type = PERSON
 		mark.color.r = 1
-		mark.color.g = 0
-	if (len(obstacle_array.obstacles) > 0 and obstacle_array.obstacles[0].id == FOLLOWING):
-		obstacle_type = FOLLOWING
-		mark.color.b = 1
-		mark.color.g = 0
+		mark.color.b = 0
+		global nb_person_marker
+		del_marker_nb = nb_person_marker
+		nb_person_marker = len(obstacle_array.obstacles)
+	if (len(obstacle_array.obstacles) > 0 and obstacle_array.obstacles[0].id == OBSTACLE):
+		obstacle_type = OBSTACLE
+		mark.color.b = 0
+		mark.color.g = 1
+		global nb_obs_marker
+		del_marker_nb = nb_obs_marker
+		nb_obs_marker = len(obstacle_array.obstacles)
 	
 	# Delete old markers
+	tab = []
 	delete = Marker()
-	mark.action = Marker.DELETE
-	for i in range(obstacle_type * MAX_OBS, (obstacle_type+1) * MAX_OBS):
-		mark.id = i
+	delete.action = Marker.DELETE
+	for i in range(del_marker_nb):
+		delete.id = obstacle_type * MAX_OBS + i
 		tab.append(delete)
 	msgDelete = MarkerArray()
 	msgDelete.markers = tab
-	pub.publish(msgDelete)
 
 	# Add new objects
 	tab = []
@@ -65,6 +76,9 @@ def callback(obstacle_array, pub):
 		tab.append(mark)
 	msgRViz = MarkerArray()
 	msgRViz.markers = tab
+
+	# Publish the messages
+	pub.publish(msgDelete)
 	pub.publish(msgRViz)
 	
 
