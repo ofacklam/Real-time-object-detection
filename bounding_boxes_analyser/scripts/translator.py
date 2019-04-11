@@ -24,12 +24,23 @@ prob_personne = 0.7 #sueil de detection pour les personnes
 PERSON = 1
 OBSTACLE = 0
 
+#Noms des fichiers memoire des temps d'execution
+path = "/home/augustin/psc/catkin_ws/src/Real-time-object-detection/tests/svg/"
+fname_depth = path+"DepthNumpyTime.txt"
+fname_yolo  = path+"YoloTime.txt"
+fname_depth_mem = path+"DepthNumpy.txt"
+#Initialisation des tableaux de memoire
+depth_time = []
+depth_mem = []
+yolo_time = []
+
 def callback(image_yolo,prof,pub,pub_pers):
     l = len(image_yolo.bounding_boxes)
     tab = []
     tab_pers=[]
-    depth_time = []
-    yolo_time = []
+    global depth_time
+    global depth_mem
+    global yolo_time
 
     for i in range(l):
         # image -> repere de la camera
@@ -74,6 +85,8 @@ def callback(image_yolo,prof,pub,pub_pers):
 
         depth_time.append(end - start)
         yolo_time.append(image_yolo.image_header.stamp - image_yolo.header.stamp)
+        depth_mem.append(depth)
+
         print('depth: ' + str(depth))
         print('depth time (en s): ' + str(depth_time[-1]))
         print('yolo_time (en ns): ' + str(yolo_time[-1]))
@@ -90,6 +103,10 @@ def callback(image_yolo,prof,pub,pub_pers):
             obs.id = OBSTACLE
             tab.append(obs)
 
+    numpy.savetxt(fname_depth,depth_time,fmt='%s')
+    numpy.savetxt(fname_yolo,yolo_time,fmt='%s')
+    numpy.savetxt(fname_depth_mem,depth_mem,fmt='%s')
+    
     msg = ObstacleArrayMsg()
     msg.header = prof.header
     msg.header.frame_id = repere
@@ -102,6 +119,7 @@ def callback(image_yolo,prof,pub,pub_pers):
 
     pub.publish(msg)
     pub_pers.publish(msg_pers)
+
 
 def depth(x,y,prof):
     #Renvoie la profondeur du point de coordonees (x,y)
