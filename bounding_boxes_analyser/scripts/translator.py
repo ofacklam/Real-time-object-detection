@@ -96,6 +96,9 @@ def callback(image_yolo,prof,pub,pub_pers):
     msg_pers.header.frame_id = repere
     msg_pers.obstacles = tab_pers
 
+    pub.publish(msg)
+    pub_pers.publish(msg_pers)
+
 def depthNumpy(box,prof):
     #Renvoie la profondeur minimale
     ba = bytearray(prof.data)

@@ -59,7 +59,9 @@ def callback(obstacle_array, pub):
 	tab = []
 	delete = Marker()
 	delete.action = Marker.DELETE
-	for i in range(del_marker_nb):
+	delete.header = obstacle_array.header
+	delete.header.frame_id = repere
+	for i in range(del_marker_nb + 10):
 		delete.id = obstacle_type * MAX_OBS + i
 		tab.append(delete)
 	msgDelete = MarkerArray()
