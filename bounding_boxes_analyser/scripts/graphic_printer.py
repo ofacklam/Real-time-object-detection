@@ -13,6 +13,15 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+def nan_filter (tab):
+    res = []
+    for i in range (len(tab)):
+        res.append([])
+        for j in range (len(tab[i])):
+            if not (np.isnan(tab[i][j])):
+                res[i].append(tab[i][j])
+    return res
+
 #Recuperation des donnees
 path = "/home/augustin/psc/catkin_ws/src/Real-time-object-detection/tests/svg/"
 depth_numpy = np.loadtxt(path+"DepthNumpy.txt")
@@ -32,7 +41,7 @@ depth_random_time = np.loadtxt(path+"Depth5Time.txt")
 depth_random_column_time = np.loadtxt(path+"Depth6Time.txt")
 depth_random_row_time = np.loadtxt(path+"Depth7Time.txt")
 yolo  = np.loadtxt(path+"YoloTime.txt") #est en ns
-name = ["numpy.min", "centre", "coix +", "croix x", "100 points aleatoires", "colonne aleatoire", "ligne aleatoire", "yolo"]
+name = ["numpy.min", "centre", "croix +", "croix x", "100 points aléatoires", "colonne aléatoire", "ligne aléatoire", "yolo"]
 
 #Mise en rapport des profondeurs
 #Les profondeurs ne designent pas les memes objets donc la courbe n'est pas continue !!!
@@ -43,12 +52,70 @@ depth_tab.append(depth_center)
 #depth_tab.append(depth_min)
 # Cette donnee doit etre enlevee car la lenteur de min python fait que le nombre de box annalysees
 # est ridiculement faible (23 contre plus de 1000 pour les autres fonctions)
+# Les statistiques ne sont donc pas applicables...
 depth_tab.append(depth_cross)
 depth_tab.append(depth_crossx)
 depth_tab.append(depth_random)
 depth_tab.append(depth_random_column)
 depth_tab.append(depth_random_row)
-l = []
+depth_tab = nan_filter(depth_tab)
+plt.boxplot(depth_tab, labels = name[:-1])
+plt.ylabel("Profondeur (en m)")
+plt.ylim(ymin=0)
+locs, labels = plt.xticks()
+plt.xticks(locs,labels,rotation = 45)
+plt.title("Profondeur renvoyée par les différentes fonctions de calcul", pad = 5)
+plt.savefig(path+"Profondeur", dpi=500, bbox_inches='tight')
+plt.show()
+plt.cla()
+
+
+#Mise en rapport des temps
+time_tab = []
+time_tab.append(depth_numpy_time)
+time_tab.append(depth_center_time)
+#time_tab.append(depth_min_time)
+# Cette donnee doit etre enlevee car la lenteur de min python fait que le nombre de box annalysees
+# est ridiculement faible (23 contre plus de 1000 pour les autres fonctions)
+time_tab.append(depth_cross_time)
+time_tab.append(depth_crossx_time)
+time_tab.append(depth_random_time)
+time_tab.append(depth_random_column_time)
+time_tab.append(depth_random_row_time)     
+time_tab = nan_filter(time_tab)
+plt.boxplot(time_tab, labels = name[:-1], whis = 100)
+plt.ylabel("Temps d'exécution (en s)")
+plt.ylim(ymin=0)
+locs, labels = plt.xticks()
+plt.xticks(locs,labels,rotation = 45)
+plt.title("Temps d'exécution des différentes fonctions de calcul", pad = 5)
+plt.savefig(path+"Temps", dpi=500, bbox_inches='tight')
+plt.show()
+plt.cla()
+
+#Comparaison avec le temps que yolo prend
+time_tab = []
+time_tab.append(depth_min_time)
+yolo /= 1000000000
+time_tab.append(yolo)
+time_tab.append(depth_numpy_time)
+time_tab = nan_filter(time_tab)
+plt.boxplot(time_tab, labels = ["min", "yolo", "numpy.min"], whis = 100)
+plt.ylabel("Temps d'exécution (en s)")
+plt.yscale('log')
+locs, labels = plt.xticks()
+plt.xticks(locs,labels,rotation = 45)
+plt.title("Temps d'exécution des différentes fonctions de calcul et de yolo", pad = 5)
+plt.savefig(path+"Temps yolo", dpi=500, bbox_inches='tight')
+plt.show()
+#plt.cla()
+
+
+
+
+
+
+""" l = []
 for i in range(len(depth_tab)):
     l.append(np.size(depth_tab[i]))
 mini = np.min(l)
@@ -162,4 +229,4 @@ plt.ylabel("Temps d'execution (en s)")
 plt.legend(loc='best')
 plt.ylim(ymin=0)
 plt.savefig(path+"Temps moyen yolo vs min", dpi=500, bbox_inches='tight')
-plt.cla()
+plt.cla() """
